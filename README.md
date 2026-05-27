@@ -1,0 +1,2 @@
+# PlantAI
+Diploma project
