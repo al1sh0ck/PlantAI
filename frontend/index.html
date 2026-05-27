@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PlantAI — Plant Health Detection</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+
+<!-- ─── Auth Modal ─────────────────────────────────────────── -->
+<div class="modal-overlay" id="authModal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <h3 id="modalTitle">Welcome to PlantAI</h3>
+
+    <div class="modal-tabs">
+      <button class="modal-tab active" id="tab-login"  onclick="switchTab('login')">Login</button>
+      <button class="modal-tab"        id="tab-signup" onclick="switchTab('signup')">Sign Up</button>
+    </div>
+
+    <div class="modal-error" id="authError"></div>
+
+    <!-- Login Form -->
+    <div id="formLogin">
+      <div class="form-group">
+        <label for="loginEmail">Email</label>
+        <input type="email" id="loginEmail" placeholder="you@example.com" />
+      </div>
+      <div class="form-group">
+        <label for="loginPass">Password</label>
+        <input type="password" id="loginPass" placeholder="••••••••" />
+      </div>
+      <button class="btn-submit" onclick="doLogin(event)">Login</button>
+    </div>
+
+    <!-- Signup Form -->
+    <div id="formSignup" style="display:none">
+      <div class="form-group">
+        <label for="signupEmail">Email</label>
+        <input type="email" id="signupEmail" placeholder="you@example.com" />
+      </div>
+      <div class="form-group">
+        <label for="signupUsername">Username</label>
+        <input type="text" id="signupUsername" placeholder="plantlover42" />
+      </div>
+      <div class="form-group">
+        <label for="signupPass">Password <small style="color:var(--gray-500)">(min 8 chars)</small></label>
+        <input type="password" id="signupPass" placeholder="••••••••" />
+      </div>
+      <button class="btn-submit" onclick="doSignup(event)">Create Account</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── Header ────────────────────────────────────────────── -->
+<header>
+  <div class="header-inner">
+    <a class="logo" href="#">
+      <div class="logo-icon">🌿</div>
+      <span class="logo-text">Plant<span>AI</span></span>
+    </a>
+    <nav>
+      <a href="#" class="active">Diagnose</a>
+      <a href="#catalog">Classes</a>
+    </nav>
+    <div class="nav-auth" id="navAuth">
+      <a href="#" class="nav a btn-nav-login" onclick="openModal('login')">Login</a>
+      <a href="#" class="nav a btn-nav-signup" onclick="openModal('signup')">Sign Up</a>
+    </div>
+    <div class="nav-user" id="navUser" style="display:none">
+      <span class="nav-user-name" id="navUsername"></span>
+      <button class="btn-logout" onclick="doLogout()">Logout</button>
+    </div>
+  </div>
+</header>
+
+<!-- ─── Hero ──────────────────────────────────────────────── -->
+<section class="hero">
+  <div class="hero-badge">🤖 EfficientNet-B0 · 38 Plant Diseases</div>
+  <h1>Plant Health Detection<br>Powered by AI</h1>
+  <p>Upload a leaf photo and get instant disease diagnosis with treatment recommendations.</p>
+</section>
+
+<!-- ─── Main ──────────────────────────────────────────────── -->
+<main>
+
+  <!-- Upload Section -->
+  <div class="upload-section">
+    <div class="card">
+      <div class="section-label">Step 1 — Upload Image</div>
+      <h2>Analyze Your Plant</h2>
+
+      <div class="drop-zone" id="dropZone">
+        <input type="file" id="fileInput" accept="image/*" />
+        <div class="drop-icon">🍃</div>
+        <div class="drop-title">Drop image here or tap to browse</div>
+        <div class="drop-sub">JPG, PNG, WebP · Max 10MB</div>
+      </div>
+
+      <div class="preview-container" id="previewContainer">
+        <img id="previewImg" class="preview-img" alt="Preview" />
+        <div class="preview-info">
+          <div>
+            <div class="preview-name" id="previewName">—</div>
+            <div class="preview-size" id="previewSize">—</div>
+          </div>
+          <button class="btn-remove" onclick="clearImage()">✕ Remove</button>
+        </div>
+      </div>
+
+      <button class="btn-analyze" id="analyzeBtn" onclick="analyzeImage()" disabled>
+        <span class="btn-label">🔍 Analyze Plant Health</span>
+        <div class="spinner"></div>
+      </button>
+    </div>
+
+    <div class="card">
+      <div class="section-label">Tips for Best Results</div>
+      <h2>Capture Guidelines</h2>
+      <div style="margin-top:0.5rem;">
+        <div class="tip-item"><div class="tip-dot"></div>Focus on a single leaf showing the clearest symptoms</div>
+        <div class="tip-item"><div class="tip-dot"></div>Photograph in natural daylight — avoid shadows or flash</div>
+        <div class="tip-item"><div class="tip-dot"></div>Fill the frame with the leaf for higher accuracy</div>
+        <div class="tip-item"><div class="tip-dot"></div>Capture the underside if symptoms appear there</div>
+        <div class="tip-item"><div class="tip-dot"></div>Keep the lens clean and hold steady to avoid blur</div>
+        <div class="tip-item"><div class="tip-dot"></div>For partially healthy plants, capture the affected area clearly</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div id="results">
+    <div class="section-label" style="margin-bottom:1rem;">Analysis Results</div>
+    <div class="results-grid">
+
+      <!-- Diagnosis Card -->
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;">
+          <div class="section-label">Diagnosis</div>
+          <span class="severity-badge" id="severityBadge">—</span>
+        </div>
+        <div id="disease-name">—</div>
+        <p style="font-size:14px;color:var(--gray-700);line-height:1.65;margin-bottom:0.75rem;" id="disease-desc">—</p>
+
+
+
+        <div class="meta-row" id="metaRow"></div>
+      </div>
+
+      <!-- Probability Bars -->
+      <div class="card">
+        <div class="section-label">Confidence Breakdown</div>
+        <h2 style="font-size:1.2rem;margin-bottom:1rem;">All 3 Classes</h2>
+        <div class="prob-bars" id="probBars"></div>
+        <div style="margin-top:1.5rem;">
+          <div class="section-label">Causes</div>
+          <p style="font-size:14px;color:var(--gray-700);line-height:1.65;" id="disease-causes">—</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Treatment Card -->
+    <div class="card">
+      <div class="section-label">Care Recommendations</div>
+      <h2>Treatment Protocol</h2>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+        <div>
+          <div class="treatment-section">
+            <h4>Immediate Actions</h4>
+            <ul class="treatment-list" id="immediate-list"></ul>
+          </div>
+          <div class="treatment-section" style="margin-top:1.5rem;">
+            <h4>Chemical Control</h4>
+            <div class="chemical-row">
+              <strong>Recommended</strong>
+              <span id="chemical-rec">—</span>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="treatment-section">
+            <h4>Prevention</h4>
+            <ul class="treatment-list" id="preventive-list"></ul>
+          </div>
+          <div class="treatment-section" style="margin-top:1.5rem;">
+            <h4>Organic Option</h4>
+            <div class="chemical-row" style="border-left:3px solid var(--green-mid);">
+              <strong>Organic</strong>
+              <span id="organic-rec">—</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- History (logged in only) -->
+  <div class="history-section card" id="historySection" style="display:none; margin-top:2rem;">
+    <div class="section-label">Your History</div>
+    <h2 style="font-size:1.3rem; margin-bottom:0.5rem;">Recent Analyses</h2>
+    <p id="historyEmpty" style="font-size:14px;color:var(--gray-500);margin-top:0.5rem;">No analyses yet. Upload your first plant photo!</p>
+    <div class="history-list" id="historyList"></div>
+  </div>
+
+  <!-- Class Catalog -->
+  <div id="catalog" style="margin-top:4rem;">
+    <div class="section-label">Supported Classes</div>
+    <h2 style="font-family:'DM Serif Display',serif;font-size:2rem;margin-bottom:0.5rem;">38 Disease Classes</h2>
+    <p style="color:var(--gray-500);font-size:14px;margin-bottom:0.5rem;">The model can detect 38 different plant diseases and conditions.</p>
+    <div class="catalog-grid" id="catalogGrid"></div>
+  </div>
+
+</main>
+
+<footer>
+  <strong>PlantAI</strong> — Diploma Project 2025 ·
+  FastAPI · PyTorch · EfficientNet-B0 · PostgreSQL · JWT Auth
+</footer>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
