@@ -10,19 +10,22 @@
 </head>
 <body>
 
+<!-- ─── Session Expired Banner ─────────────────────────────── -->
+<div id="sessionBanner" style="display:none; position:fixed; top:0; left:0; right:0; z-index:300; background:#7f1d1d; color:white; padding:12px 2rem; text-align:center; font-size:14px; font-weight:500; align-items:center; justify-content:center; gap:10px;">
+  ⏱ Your session expired. Please log in again.
+  <button onclick="document.getElementById('sessionBanner').style.display='none'" style="background:rgba(255,255,255,0.2);border:none;color:white;padding:4px 10px;border-radius:6px;cursor:pointer;font-size:12px;">✕</button>
+</div>
+
 <!-- ─── Auth Modal ─────────────────────────────────────────── -->
 <div class="modal-overlay" id="authModal" onclick="if(event.target===this)closeModal()">
   <div class="modal">
     <button class="modal-close" onclick="closeModal()">×</button>
     <h3 id="modalTitle">Welcome to PlantAI</h3>
-
     <div class="modal-tabs">
       <button class="modal-tab active" id="tab-login"  onclick="switchTab('login')">Login</button>
       <button class="modal-tab"        id="tab-signup" onclick="switchTab('signup')">Sign Up</button>
     </div>
-
     <div class="modal-error" id="authError"></div>
-
     <!-- Login Form -->
     <div id="formLogin">
       <div class="form-group">
@@ -35,7 +38,6 @@
       </div>
       <button class="btn-submit" onclick="doLogin(event)">Login</button>
     </div>
-
     <!-- Signup Form -->
     <div id="formSignup" style="display:none">
       <div class="form-group">
@@ -51,6 +53,59 @@
         <input type="password" id="signupPass" placeholder="••••••••" />
       </div>
       <button class="btn-submit" onclick="doSignup(event)">Create Account</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── Profile Modal ──────────────────────────────────────── -->
+<div class="modal-overlay" id="profileModal" onclick="if(event.target===this)closeProfile()">
+  <div class="modal modal-wide">
+    <button class="modal-close" onclick="closeProfile()">×</button>
+    <h3>My Profile</h3>
+
+    <!-- User info row -->
+    <div class="profile-info-row">
+      <div class="profile-avatar">🌿</div>
+      <div class="profile-details">
+        <div class="profile-username" id="profileUsername">—</div>
+        <div class="profile-email" id="profileEmail">—</div>
+        <div class="profile-id">User <span id="profileJoined">—</span></div>
+      </div>
+    </div>
+
+    <!-- Stats row -->
+    <div class="profile-stats">
+      <div class="stat-card">
+        <div class="stat-number" id="statTotal">—</div>
+        <div class="stat-label">Total Analyses</div>
+      </div>
+      <div class="stat-card stat-healthy">
+        <div class="stat-number" id="statHealthy">—</div>
+        <div class="stat-label">Healthy</div>
+      </div>
+      <div class="stat-card stat-diseased">
+        <div class="stat-number" id="statDiseased">—</div>
+        <div class="stat-label">Diseased</div>
+      </div>
+    </div>
+
+    <!-- History table -->
+    <div style="margin-top:1.5rem;">
+      <div class="section-label">Prediction History</div>
+      <div style="overflow-x:auto;margin-top:0.75rem;">
+        <table class="profile-table">
+          <thead>
+            <tr><th>Date</th><th>Disease</th><th>Status</th><th>Confidence</th></tr>
+          </thead>
+          <tbody id="profileHistoryBody">
+            <tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--gray-500);">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div style="margin-top:1.5rem;text-align:right;">
+      <button class="btn-submit" style="width:auto;padding:10px 24px;background:var(--red);font-size:14px;" onclick="doLogout();closeProfile()">Logout</button>
     </div>
   </div>
 </div>
@@ -71,7 +126,7 @@
       <a href="#" class="nav a btn-nav-signup" onclick="openModal('signup')">Sign Up</a>
     </div>
     <div class="nav-user" id="navUser" style="display:none">
-      <span class="nav-user-name" id="navUsername"></span>
+      <button class="btn-profile" onclick="openProfile()" id="navUsername">👤 Profile</button>
       <button class="btn-logout" onclick="doLogout()">Logout</button>
     </div>
   </div>
@@ -92,14 +147,12 @@
     <div class="card">
       <div class="section-label">Step 1 — Upload Image</div>
       <h2>Analyze Your Plant</h2>
-
       <div class="drop-zone" id="dropZone">
         <input type="file" id="fileInput" accept="image/*" />
         <div class="drop-icon">🍃</div>
         <div class="drop-title">Drop image here or tap to browse</div>
         <div class="drop-sub">JPG, PNG, WebP · Max 10MB</div>
       </div>
-
       <div class="preview-container" id="previewContainer">
         <img id="previewImg" class="preview-img" alt="Preview" />
         <div class="preview-info">
@@ -110,7 +163,6 @@
           <button class="btn-remove" onclick="clearImage()">✕ Remove</button>
         </div>
       </div>
-
       <button class="btn-analyze" id="analyzeBtn" onclick="analyzeImage()" disabled>
         <span class="btn-label">🔍 Analyze Plant Health</span>
         <div class="spinner"></div>
@@ -126,7 +178,7 @@
         <div class="tip-item"><div class="tip-dot"></div>Fill the frame with the leaf for higher accuracy</div>
         <div class="tip-item"><div class="tip-dot"></div>Capture the underside if symptoms appear there</div>
         <div class="tip-item"><div class="tip-dot"></div>Keep the lens clean and hold steady to avoid blur</div>
-        <div class="tip-item"><div class="tip-dot"></div>For partially healthy plants, capture the affected area clearly</div>
+        <div class="tip-item"><div class="tip-dot"></div>For partially affected plants, capture the affected area clearly</div>
       </div>
     </div>
   </div>
@@ -145,7 +197,11 @@
         <div id="disease-name">—</div>
         <p style="font-size:14px;color:var(--gray-700);line-height:1.65;margin-bottom:0.75rem;" id="disease-desc">—</p>
 
-
+        <!-- Symptoms -->
+        <div id="symptoms-container" style="display:none;margin-bottom:0.75rem;">
+          <div class="section-label" style="margin-bottom:6px;">Symptoms</div>
+          <ul class="treatment-list" id="symptoms-list"></ul>
+        </div>
 
         <div class="meta-row" id="metaRow"></div>
       </div>
@@ -153,7 +209,7 @@
       <!-- Probability Bars -->
       <div class="card">
         <div class="section-label">Confidence Breakdown</div>
-        <h2 style="font-size:1.2rem;margin-bottom:1rem;">All 15 Classes</h2>
+        <h2 style="font-size:1.2rem;margin-bottom:1rem;">Top Predictions</h2>
         <div class="prob-bars" id="probBars"></div>
         <div style="margin-top:1.5rem;">
           <div class="section-label">Causes</div>
@@ -199,9 +255,14 @@
 
   <!-- History (logged in only) -->
   <div class="history-section card" id="historySection" style="display:none; margin-top:2rem;">
-    <div class="section-label">Your History</div>
-    <h2 style="font-size:1.3rem; margin-bottom:0.5rem;">Recent Analyses</h2>
-    <p id="historyEmpty" style="font-size:14px;color:var(--gray-500);margin-top:0.5rem;">No analyses yet. Upload your first plant photo!</p>
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+      <div>
+        <div class="section-label">Your History</div>
+        <h2 style="font-size:1.3rem; margin-bottom:0;">Recent Analyses</h2>
+      </div>
+      <button class="btn-view-all" onclick="openProfile()">View All →</button>
+    </div>
+    <p id="historyEmpty" style="font-size:14px;color:var(--gray-500);margin-top:0.75rem;">No analyses yet. Upload your first plant photo!</p>
     <div class="history-list" id="historyList"></div>
   </div>
 
@@ -209,7 +270,11 @@
   <div id="catalog" style="margin-top:4rem;">
     <div class="section-label">Supported Classes</div>
     <h2 style="font-family:'DM Serif Display',serif;font-size:2rem;margin-bottom:0.5rem;">15 Disease Classes</h2>
-    <p style="color:var(--gray-500);font-size:14px;margin-bottom:0.5rem;">The model can detect 15 different plant diseases and conditions.</p>
+    <p style="color:var(--gray-500);font-size:14px;margin-bottom:1rem;">The model detects 15 plant diseases. Filter by crop type:</p>
+
+    <!-- Crop filter bar -->
+    <div class="catalog-filter-bar" id="catalogFilters"></div>
+
     <div class="catalog-grid" id="catalogGrid"></div>
   </div>
 

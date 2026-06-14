@@ -65,7 +65,7 @@ main { max-width: 1100px; margin: 0 auto; padding: 3rem 2rem; }
 /* ─── Auth Modal ─────────────────────────────────────────────── */
 .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; align-items: center; justify-content: center; }
 .modal-overlay.active { display: flex; }
-.modal { background: white; border-radius: var(--radius-lg); padding: 2rem; width: 100%; max-width: 420px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+.modal { background: white; border-radius: var(--radius-lg); padding: 2rem; width: 100%; max-width: 420px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); max-height: 90vh; overflow-y: auto; }
 .modal h3 { font-family: 'DM Serif Display', serif; font-size: 1.6rem; margin-bottom: 1.5rem; }
 .modal-tabs { display: flex; gap: 4px; background: var(--gray-100); padding: 4px; border-radius: var(--radius-sm); margin-bottom: 1.5rem; }
 .modal-tab { flex: 1; padding: 8px; border: none; background: none; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer; transition: var(--transition); color: var(--gray-500); }
@@ -196,3 +196,48 @@ main { max-width: 1100px; margin: 0 auto; padding: 3rem 2rem; }
 /* ─── Footer ──────────────────────────────────────────────────── */
 footer { background: var(--green-dark); color: rgba(255,255,255,0.6); text-align: center; padding: 2rem; font-size: 13px; margin-top: 4rem; }
 footer strong { color: white; }
+
+/* ─── Session Banner (already inline, extra safety) ─────────── */
+
+/* ─── Profile Modal ──────────────────────────────────────────── */
+.modal-wide { max-width: 680px !important; }
+
+.profile-info-row { display: flex; align-items: center; gap: 1.25rem; margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--gray-200); }
+.profile-avatar { width: 64px; height: 64px; background: var(--green-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; flex-shrink: 0; }
+.profile-username { font-family: 'DM Serif Display', serif; font-size: 1.4rem; color: var(--gray-900); }
+.profile-email { font-size: 14px; color: var(--gray-500); margin-top: 2px; }
+.profile-id { font-size: 12px; color: var(--gray-400); margin-top: 4px; }
+
+.profile-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 0.5rem; }
+.stat-card { background: var(--gray-100); border-radius: var(--radius-md); padding: 1rem; text-align: center; }
+.stat-card.stat-healthy  { background: var(--green-light); }
+.stat-card.stat-diseased { background: var(--red-light); }
+.stat-number { font-family: 'DM Serif Display', serif; font-size: 2rem; color: var(--gray-900); }
+.stat-label  { font-size: 12px; color: var(--gray-500); margin-top: 2px; }
+
+.profile-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.profile-table th { text-align: left; padding: 10px 12px; background: var(--gray-100); color: var(--gray-500); font-size: 11px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; border-bottom: 1px solid var(--gray-200); }
+.profile-table td { padding: 10px 12px; border-bottom: 1px solid var(--gray-100); color: var(--gray-700); }
+.profile-table tr:last-child td { border-bottom: none; }
+.profile-table tr:hover td { background: var(--gray-100); }
+
+/* ─── Profile button in nav ───────────────────────────────────── */
+.btn-profile { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.25); color: rgba(255,255,255,0.85); padding: 6px 14px; border-radius: var(--radius-sm); cursor: pointer; font-size: 14px; font-weight: 500; font-family: 'DM Sans', sans-serif; transition: var(--transition); }
+.btn-profile:hover { background: rgba(255,255,255,0.2); color: white; }
+
+/* ─── "View All" button in history ───────────────────────────── */
+.btn-view-all { background: var(--green-light); border: none; color: var(--green-dark); padding: 8px 16px; border-radius: var(--radius-sm); cursor: pointer; font-size: 13px; font-weight: 600; font-family: 'DM Sans', sans-serif; transition: var(--transition); }
+.btn-view-all:hover { background: var(--green-mid); color: white; }
+
+/* ─── Catalog filter bar ─────────────────────────────────────── */
+.catalog-filter-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1.5rem; }
+.crop-filter-btn { background: white; border: 1.5px solid var(--gray-200); color: var(--gray-700); padding: 7px 14px; border-radius: 100px; cursor: pointer; font-size: 13px; font-weight: 500; font-family: 'DM Sans', sans-serif; transition: var(--transition); }
+.crop-filter-btn:hover { border-color: var(--green-mid); color: var(--green-dark); }
+.crop-filter-btn.active { background: var(--green-dark); border-color: var(--green-dark); color: white; }
+
+/* ─── Catalog card improvements ──────────────────────────────── */
+.catalog-symptoms { list-style: none; margin: 8px 0; padding: 0; }
+.catalog-symptoms li { font-size: 12px; color: var(--gray-600, #4b5563); padding: 2px 0 2px 14px; position: relative; }
+.catalog-symptoms li::before { content: ''; position: absolute; left: 0; top: 7px; width: 5px; height: 5px; background: var(--amber); border-radius: 50%; }
+.catalog-cure { font-size: 12px; background: var(--green-light); border-radius: 6px; padding: 6px 10px; margin: 6px 0; color: var(--green-dark); }
+.cure-label { font-weight: 600; }
