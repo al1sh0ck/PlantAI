@@ -120,20 +120,7 @@ python train.py --data_dir ./data/PlantHealth --epochs 30 --batch_size 32
 # Saves weights to models/plantai_efficientnet_b0.pth
 ```
 
-Dataset structure:
-```
-data/PlantHealth/
-    Healthy/
-    Partially_Healthy/
-    Unhealthy/
-```
-
----
-
 ## ML Classes
 
-| Class              | Severity | Description                          |
-|--------------------|----------|--------------------------------------|
-| Healthy            | None     | Vibrant, no disease signs            |
-| Partially_Healthy  | Medium   | Early-stage stress, some lesions     |
-| Unhealthy          | High     | Severe infection, immediate action   |
+[PlantAI] Classes (15): ['Pepper__bell___Bacterial_spot', 'Pepper__bell___healthy', 'Potato___Early_blight', 'Potato___Late_blight', 'Potato___healthy', 'Tomato_Bacterial_spot', 'Tomato_Early_blight', 'Tomato_Late_blight', 'Tomato_Leaf_Mold', 'Tomato_Septoria_leaf_spot', 'Tomato_Spider_mites_Two_spotted_spider_mite', 'Tomato__Target_Spot', 'Tomato__Tomato_YellowLeaf__Curl_Virus', 'Tomato__Tomato_mosaic_virus', 'Tomato_healthy']
+
